@@ -56,6 +56,16 @@ export const logout=catchAsyncError(async (req,res,next)=>{
     })
 })
 
+export const getMyProfile=catchAsyncError(async (req,res,next)=>{
+    const user=await Users.findById(req.user._id)
+    res.status(200).json({
+        success:true,
+       user,
+
+    })
+})
+
+
 export const allUser=catchAsyncError(async(req,res,next)=>{
 
     let user=await Users.find()
