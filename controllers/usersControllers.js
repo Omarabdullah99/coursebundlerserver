@@ -65,6 +65,48 @@ export const getMyProfile=catchAsyncError(async (req,res,next)=>{
     })
 })
 
+export const chnagePassword=catchAsyncError(async (req,res,next)=>{
+    const {oldPassword,newPassword}=req.body
+    if(!oldPassword || !newPassword)
+    return next(new ErrorHandler("please enter all field",400))
+
+    const user=await Users.findById(req.user._id).select("+password")
+
+    const isMatch=await user.comparePassword(oldPassword)
+    if(!isMatch) return next(new ErrorHandler("Incorrect old password",400))
+    user.password=newPassword
+    await user.save()
+    res.status(200).json({
+        success:true,
+       message:"Password Changed successfully"
+
+    })
+})
+
+export const updateProfile=catchAsyncError(async (req,res,next)=>{
+    const {name,email}=req.body
+    const user=await Users.findById(req.user._id)
+
+    if(name) user.name=name;
+    if(email) user.email=email
+
+
+    await user.save()
+    res.status(200).json({
+        success:true,
+       message:"Profile updated successfully"
+
+    })
+})
+
+export const updateprofilepicture=catchAsyncError(async(req,res,next)=>{
+    //cloudinary:TODO
+    res.status(200).json({
+        success:ture,
+        message:"Profile Picture Update Successfully"
+    })
+})
+
 
 export const allUser=catchAsyncError(async(req,res,next)=>{
 
