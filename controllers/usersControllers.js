@@ -118,6 +118,7 @@ export const updateprofilepicture=catchAsyncError(async(req,res,next)=>{
         url:mycloud.secure_url,
     };
     await user.save()
+
     res.status(200).json({
         success:true,
         message:"Profile Picture Update Successfully"
@@ -219,6 +220,67 @@ export const removeFromPlaylist=catchAsyncError(async(req,res,next)=>{
     })
 
     
+})
+
+//admin controllers get all users
+export const getAllUsers=catchAsyncError(async(req,res,next)=>{
+
+    const users=await Users.find({})
+    
+    res.status(200).json({
+        success:true,
+        users,
+        
+    }) 
+})
+
+//update user role
+export const updateUserRole=catchAsyncError(async(req,res,next)=>{
+
+    const user=await Users.findById(req.params.id)
+    if(!user) return next(new ErrorHandler("user not found",404))
+
+    if(user.role==="user") user.role="admin"
+    else user.role="user"
+    await user.save()
+    
+    res.status(200).json({
+        success:true,
+        message:"Role Updated"
+        
+    }) 
+})
+//delete a user 
+export const deleteUser=catchAsyncError(async(req,res,next)=>{
+
+    const user=await Users.findById(req.params.id)
+    if(!user) return next(new ErrorHandler("user not found",404))
+
+    await cloudinary.v2.uploader.destroy(user.avatar.public_id)
+    await user.remove()
+    
+    res.status(200).json({
+        success:true,
+        message:"user deleted successfully"
+        
+    }) 
+})
+//delete my profile  
+export const deleteMyProfile=catchAsyncError(async(req,res,next)=>{
+
+    const user=await Users.findById(req.user._id)
+    if(!user) return next(new ErrorHandler("my profile not found",404))
+
+    await cloudinary.v2.uploader.destroy(user.avatar.public_id)
+    await user.remove()
+    
+    res.status(200).cookie("token",null,{
+        expires:new Date(Date.now())
+    }).json({
+        success:true,
+        message:"user deleted successfully"
+        
+    }) 
 })
 
 

@@ -23,6 +23,7 @@
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.0",
     "razorpay": "^2.8.4",
-    "validator": "^13.7.0" 
+    "stripe": "^11.10.0",
+    "validator": "^13.7.0"
   }
 }
