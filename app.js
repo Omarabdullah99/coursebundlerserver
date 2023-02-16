@@ -33,6 +33,9 @@ app.use("/api/v1",users)
 //import payment route
 import Paymet from "./routes/paymentRoute.js"
 app.use("/api/v1",Paymet)
+//import othercontroller route
+import othercontroller from './routes/otherRoutes.js'
+app.use("/api/v1",othercontroller)
 
 export default app
 app.use(ErrorMiddleware)
