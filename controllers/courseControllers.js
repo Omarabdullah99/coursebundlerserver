@@ -3,6 +3,7 @@ import {Course} from '../models/Course.js'
 import getDataUri from '../utils/dataurl.js';
 import  ErrorHandler from '../utils/errorHandler.js'
 import cloudinary from "cloudinary"
+import { Stats } from '../models/Stats.js';
 export const getAllCourses = catchAsyncError(
     async(req,res,next)=>{
         const courses=await Course.find().select("-lectures");
@@ -145,3 +146,16 @@ export const deleteLecture = catchAsyncError(async (req, res, next) => {
       message: "Lecture Deleted Successfully",
     });
   });
+
+  Course.watch().on("change",async()=>{
+    const stats=await Stats.find({}).sort({createdAt:"desc"}).limit(1)
+    const courses=await Course.find({})
+    totalViews=0;
+    for (let i = 0; i < courses.length; i++) {
+        totalViews += courses[i].views;    
+    }
+
+    stats[0].views=totalViews
+    await stats[0].save();
+
+  })

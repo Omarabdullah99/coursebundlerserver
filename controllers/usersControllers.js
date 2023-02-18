@@ -7,6 +7,8 @@ import { sendEmail } from "../utils/sendEmail.js";
 import crypto from 'crypto'
 import getDataUri from "../utils/dataurl.js";
 import cloudinary from 'cloudinary'
+import { Stats } from "../models/Stats.js";
+import { stat } from "fs";
 export const register=catchAsyncError(async(req,res,next)=>{
     const {name,email,password}=req.body;
     
@@ -292,6 +294,14 @@ export const allUser=catchAsyncError(async(req,res,next)=>{
     let user=await Users.find()
     res.send(user)
     
+})
+Users.watch().on("change",async()=>{
+    const stats=await Stats.find({}).sort({createdAt:"desc"}).limit(1)
 
+    const subscription=await Users.find({"subscription.status":"active"})
+    stats[0].user=await Users.countDocuments();
+    stats[0].subscription= subscription.length;
+    stats[0].createdAt=new Date(Date.now())
 
+    await stats[0].save();
 })
