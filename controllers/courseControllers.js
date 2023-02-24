@@ -6,7 +6,18 @@ import cloudinary from "cloudinary"
 import { Stats } from '../models/Stats.js';
 export const getAllCourses = catchAsyncError(
     async(req,res,next)=>{
-        const courses=await Course.find().select("-lectures");
+        const keyword = req.query.keyword || "";
+      const category = req.query.category || "";
+        const courses=await Course.find({
+            title: {
+                $regex: keyword,
+                $options: "i",
+              },
+              category: {
+                $regex: category,
+                $options: "i",
+              },
+        }).select("-lectures");
         res.status(200).json({
             success:true,
             courses
@@ -150,7 +161,7 @@ export const deleteLecture = catchAsyncError(async (req, res, next) => {
   Course.watch().on("change",async()=>{
     const stats=await Stats.find({}).sort({createdAt:"desc"}).limit(1)
     const courses=await Course.find({})
-    totalViews=0;
+    let totalViews=0;
     for (let i = 0; i < courses.length; i++) {
         totalViews += courses[i].views;    
     }
